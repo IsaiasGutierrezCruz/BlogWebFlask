@@ -21,8 +21,17 @@
 	</div>
 </div>
 {% endblock %}
+
 {% block content %}
 	<div class="container">
+		<!-- Flashed messages -->
+		{% for message in get_flashed_messages() %}
+		<div class="alert alert-warning">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			{{ message }}
+		</div>
+		{% endfor %}
+		<!-- Page content -->
 		{% block page_content %}{% endblock %}
 	</div>
 {% endblock %}
