@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment # manage dates 
 from datetime import datetime # get dates 
@@ -16,12 +16,11 @@ moment = Moment(app)
 @app.route('/', methods = ['GET', 'POST'])
 def index():
     #user_agent = request.headers.get('User-Agent') #example of a request
-    name = None
     form = Form1()
     if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ''
-    return render_template('index.html', current_time = datetime.utcnow(), form = form, name = name)
+        session['name'] = form.name.data
+        return redirect(url_for('index'))
+    return render_template('index.html', current_time = datetime.utcnow(), form = form, name = session.get('name'))
 
 @app.route('/about.html')
 def about():
