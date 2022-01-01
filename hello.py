@@ -6,12 +6,21 @@ from datetime import datetime # get dates
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+# database
+from flask_sqlalchemy import SQLAlchemy
+import psycopg2
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'qwerty'
 Bootstrap = Bootstrap(app)
 moment = Moment(app)
+# database
+app.config['SQLALCHEMY_DATABASE_URI'] =\
+    "postgresql://root:qwerty@localhost/dbFlask"
+app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
 
 @app.route('/', methods = ['GET', 'POST'])
 def index():
@@ -45,3 +54,21 @@ def interval_server_error(e):
 class Form1(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+# ----- construct entities -----
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    users = db.relationship('User', backref='role')
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, index=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    def __repr__(self):
+        return '<User %r>' % self.username
+
