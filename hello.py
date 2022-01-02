@@ -11,6 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 # migrations
 from flask_migrate import Migrate
+# email 
+from flask_mail import Mail
+import os 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'qwerty'
@@ -18,11 +21,19 @@ Bootstrap = Bootstrap(app)
 moment = Moment(app)
 # database
 app.config['SQLALCHEMY_DATABASE_URI'] =\
-    "postgresql://root:qwerty@localhost/dbFlask"
+    "postgresql://root:qwerty@localhost/dbflask2"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # migration
 migrate = Migrate(app, db)
+# email
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+mail = Mail(app)
+
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -38,6 +49,7 @@ def index():
             db.session.add(user)
             db.session.commit()
             session['known'] = False
+            flash('You has been registered')
         else:
             session['known'] = True
         session['name'] = form.name.data
