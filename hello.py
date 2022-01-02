@@ -18,21 +18,29 @@ moment = Moment(app)
 # database
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     "postgresql://root:qwerty@localhost/dbFlask"
-app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
 @app.route('/', methods = ['GET', 'POST'])
 def index():
-    #user_agent = request.headers.get('User-Agent') #example of a request
     form = Form1()
+    # validate the form's data
     if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('Looks like you have changed your name!')
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            # create the user if he does not exist and assign a role to him/her
+            user_role = Role.query.filter_by(name='User').first()
+            user = User(username = form.name.data, role=user_role)
+            db.session.add(user)
+            db.session.commit()
+            session['known'] = False
+        else:
+            session['known'] = True
         session['name'] = form.name.data
+        form.name.data = ''
         return redirect(url_for('index'))
-    return render_template('index.html', current_time = datetime.utcnow(), form = form, name = session.get('name'))
+    return render_template('index.html', current_time = datetime.utcnow(), form=form, name=session.get('name'), known=session.get('known', False))
 
 @app.route('/about.html')
 def about():
@@ -55,12 +63,13 @@ class Form1(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+
 # ----- construct entities -----
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
-    users = db.relationship('User', backref='role')
+    users = db.relationship('User', backref='role', lazy='dynamic')
     def __repr__(self):
         return '<Role %r>' % self.name
 
@@ -71,4 +80,3 @@ class User(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     def __repr__(self):
         return '<User %r>' % self.username
-
