@@ -9,7 +9,8 @@ from wtforms.validators import DataRequired
 # database
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
-
+# migrations
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'qwerty'
@@ -20,6 +21,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
     "postgresql://root:qwerty@localhost/dbFlask"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+# migration
+migrate = Migrate(app, db)
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -82,7 +85,9 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 
-# create and register of the shell context processor 
+# ----------- create and register of the shell context processor ---------
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db, User=User, Role=Role)
+
+# --------------- Migrations --------------------
