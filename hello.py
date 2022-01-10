@@ -18,12 +18,12 @@ import os
 from threading import Thread
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'qwerty'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 Bootstrap = Bootstrap(app)
 moment = Moment(app)
 # database
 app.config['SQLALCHEMY_DATABASE_URI'] =\
-    "postgresql://root:qwerty@localhost/dbflask2"
+    "postgresql://root:DATABASE_KEY@localhost/dbflask2"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # migration
