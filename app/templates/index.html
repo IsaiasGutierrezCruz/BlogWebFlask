@@ -17,16 +17,17 @@
 {% block page_content %}
 <div class="page-header">
   <!-- custom greeting -->
-  <h1>Hello, {% if name %}{{ name }}{% else %} Stranger {% endif %}!</h1>
+  <!-- <h1>Hello, {% if name %}{{ name }}{% else %} Stranger {% endif %}!</h1>
   {% if not known %}
   <h3>Pleased to meet you!</h3>
   {% else %}
   <h3>Happy to see you again!</h3>
   {% endif %}
-  <!-- function of the time -->
+
   <h3>This is the time:</h3>
   <p>The local date and time is {{ moment(current_time).format('LLL') }}.</p>
-  <p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
+  <p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>-->
+  <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
 </div>
-{{ wtf.quick_form(form) }}
+<!-- {{ wtf.quick_form(form) }} -->
 {% endblock %}
