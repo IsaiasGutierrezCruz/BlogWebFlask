@@ -10,6 +10,7 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
+# flask login
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
